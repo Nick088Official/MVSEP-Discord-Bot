@@ -1,6 +1,7 @@
 import os
 import discord
-from discord.ext import commands
+from discord.ext import tasks, commands
+from discord import app_commands
 from dotenv import load_dotenv
 import requests
 
@@ -8,13 +9,15 @@ load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 MVSEP_API_KEY = os.getenv('MVSEP_API_KEY')
 
-bot = commands.Bot(command_prefix='/', intents=discord.Intents.default())
+# Initialize Discord bot
+bot = discord.Client(command_prefix="!", intents=discord.Intents.default())
+tree = app_commands.CommandTree(bot)
 
 @bot.event
 async def on_ready():
    print(f'{bot.user.name} has connected to Discord!')
 
-@bot.slash_command(name='separate', description='Separate audio using MVSEP')
+@tree.command(name='separate', description='Separate audio using MVSEP')
 async def separate(ctx, url: str):
    await ctx.defer()
    api_url = 'https://mvsep.com/api/separate'
