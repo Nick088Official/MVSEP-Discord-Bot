@@ -24,10 +24,7 @@ async def separate(ctx, url: str):
    response = requests.post(api_url, headers=headers, json=payload)
    if response.status_code == 200:
       data = response.json()
-      await ctx.send(f"Separation complete! Download links:
-
-Vocal: {data['vocal']}
-Instrumental: {data['instrumental']}")
+      await ctx.send(f"Separation complete! Download links:\n Vocal: {data['vocal']}\n Instrumental: {data['instrumental']}")
    else:
       await ctx.send(f"Error: {response.status_code} - {response.text}")
 
