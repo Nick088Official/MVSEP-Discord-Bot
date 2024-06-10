@@ -3,6 +3,8 @@ import discord
 from discord.ext import tasks, commands
 from discord import app_commands
 import requests
+import aiohttp
+import asyncio
 
 DISCORD_BOT_TOKEN = os.environ['DISCORD_BOT_TOKEN']
 MVSEP_API_KEY = os.environ['MVSEP_API_KEY']
@@ -16,8 +18,16 @@ async def on_ready():
   await tree.sync()
   print(f'{bot.user.name} has connected to Discord!')
 
+
 @tree.command(name="separate", description="Separate uploaded audio into its components")
-async def separate(interaction: discord.Interaction, audio_file: discord.Attachment):
+@app_commands.describe(sep_type='The Separation Type')
+@app_commands.choices(sep_type=[
+  discord.app_commands.Choice(name="Ensemble (vocals, instrum)", value=26),
+  discord.app_commands.Choice(name="Ensemble (vocals, instrum, bass, drums, other)", value=28),
+  ]
+)
+async def separate(interaction: discord.Interaction, audio_file: discord.Attachment, sep_type: discord.app_commands.sep_type[int]):
+    
     await interaction.response.defer()
     try:
         # Download the file
@@ -30,7 +40,7 @@ async def separate(interaction: discord.Interaction, audio_file: discord.Attachm
             with open(file_path, 'rb') as f:
                 data = {
                     'api_token': MVSEP_API_KEY,
-                    'sep_type': '35',
+                    'sep_type': sep_type,
                     'add_opt1': '5', 
                     'audiofile': f
                 }
